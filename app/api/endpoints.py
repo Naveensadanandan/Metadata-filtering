@@ -9,7 +9,6 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     retrieved_items: list[dict]
-    retrieved_count: float
 
 @app.post("/query", response_model=QueryResponse)
 async def query_database(request: QueryRequest):

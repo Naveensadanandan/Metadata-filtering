@@ -48,9 +48,7 @@ def generate_sql_and_execute(user_query: str):
         # 3. Parse findings
         results = []
         for item in retrieved_nodes:
-            print(f"Item type: {type(item)}")
-            print(item)
-            
+
             table_name = "Unknown"
             score = 0
             content = ""
@@ -62,11 +60,6 @@ def generate_sql_and_execute(user_query: str):
                 table_name = node.metadata.get("table_name", "Unknown") if node.metadata else "Unknown"
                 score = round(item.score, 4) if item.score else 0
                 content = node.get_content()
-            elif hasattr(item, "metadata"):
-                # Direct Node object
-                table_name = item.metadata.get("table_name", "Unknown") if item.metadata else "Unknown"
-                score = "N/A"
-                content = item.get_content()
             else:
                 # Fallback: treat as object with table_name attribute
                 table_name = getattr(item, "table_name", "Unknown")
