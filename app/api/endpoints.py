@@ -1,17 +1,17 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from app.engine.generator import generate_sql_and_execute
 
-router = APIRouter()
+app = FastAPI()
 
 class QueryRequest(BaseModel):
     question: str
 
 class QueryResponse(BaseModel):
-    answer: str
-    generated_sql: str
+    retrieved_items: list[dict]
+    retrieved_count: float
 
-@router.post("/query", response_model=QueryResponse)
+@app.post("/query", response_model=QueryResponse)
 async def query_database(request: QueryRequest):
     try:
         result = generate_sql_and_execute(request.question)
