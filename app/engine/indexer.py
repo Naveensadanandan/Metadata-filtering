@@ -6,6 +6,7 @@ from llama_index.core.objects import (
     SQLTableSchema,
 )
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core.schema import TextNode
 from app.core.config import settings
 Settings.llm = None
 Settings.embed_model = HuggingFaceEmbedding(
@@ -42,5 +43,32 @@ def build_schema_index():
         index_cls=VectorStoreIndex,
     )
 
+    column_index = build_column_index(table_names, inspector)
+
     print("Schema Index built successfully with local embeddings!")
-    return obj_index
+    return obj_index, column_index
+
+def build_column_index(table_names, inspector):
+
+    column_nodes = []
+
+    for table in table_names:
+        for col in inspector.get_columns(table):
+            column_text = (
+                f"Table: {table}\n"
+                f"Column: {col['name']}\n"
+                f"Type: {col['type']}"
+            )
+
+            column_nodes.append(
+                TextNode(
+                    text=column_text,
+                    metadata={
+                        "table": table,
+                        "column": col["name"]
+                    }
+                )
+            )
+    column_index = VectorStoreIndex(column_nodes)
+    return column_index
+
